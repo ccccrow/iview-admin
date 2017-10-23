@@ -115,6 +115,7 @@ const store = new Vuex.Store({
             ...editRouter
         ],
         orgList:[],
+        roleList:[],
         menuList: [],
         tagsList: [...otherRouter.children],
         prePage: '',
@@ -138,6 +139,9 @@ const store = new Vuex.Store({
     mutations: {
         initOrg(state, list) {
             state.orgList.push(...list);
+        },
+        initRole(state,list){
+            state.roleList.push(...list);
         },
         setTagsList (state, list) {
             state.tagsList.push(...list);

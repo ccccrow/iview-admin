@@ -1,14 +1,14 @@
 <template>
   <Card>
-  <Form :model="form" :label-width="80" :rules="rules" ref="form" style="width:50%;">
-    <Form-item label="机构名称" prop="orgname">
+  <Form :model="form" :label-width="120" :rules="rules" ref="form" style="width:50%;">
+    <Form-item label="机构名称：" prop="orgname">
       <Input v-model="form.orgname"></Input>
     </Form-item>
-    <Form-item label="排序号" prop="sort" >
+    <Form-item label="排序号：" prop="sort" >
       <Input v-model="form.sort"></Input>
     </Form-item>
     <Form-item>
-  <Button type="primary" @click.native="submitData">保存</Button>
+  <Button type="primary" @click.native="submitData" :loading="save_loading">保存</Button>
   <Button type="ghost" @click.native="finishEdit('sys_org')" style="margin-left:15px;">取消</Button>
     </Form-item>
   </Form>

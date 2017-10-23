@@ -1,26 +1,31 @@
 <template>
   <Card>
-  <Form :model="form" :label-width="80" :rules="rules" ref="form" style="width:50%;">
-    <Form-item label="用户名" prop="username">
+  <Form :model="form" :label-width="120" :rules="rules" ref="form" style="width:50%;">
+    <Form-item label="用户名：" prop="username">
       <Input v-model="form.username"></Input>
     </Form-item>
-    <Form-item label="姓名" prop="realname">
+    <Form-item label="姓名：" prop="realname">
       <Input v-model="form.realname"></Input>
     </Form-item>
-    <Form-item label="手机号码" prop="mobile">
+    <Form-item label="手机号码：" prop="mobile">
       <Input v-model="form.mobile"></Input>
     </Form-item>
-    <Form-item label="密码" prop="password" v-if="!modstatus">
+    <Form-item label="密码：" prop="password" v-if="!modstatus">
       <Input v-model="form.password" type="password"></Input>
     </Form-item>
-    <Form-item label="确认密码" prop="password1" v-if="!modstatus">
+    <Form-item label="确认密码：" prop="password1" v-if="!modstatus">
       <Input v-model="form.password1" type="password"></Input>
     </Form-item>
-    <Form-item label="所属机构">
+    <Form-item label="所属机构：">
       <Cascader :data="options" :value="orgArr" change-on-select @on-change="orgTreeChange"></Cascader>
     </Form-item>
+    <Form-item label="角色：">
+      <Select v-model="roleArr" style="width:200px" multiple @on-change="changerole">
+        <Option v-for="item in roleList" :value="item.id" :key="item.id">{{ item.rolename }}</Option>
+    </Select>
+    </Form-item>
     <Form-item>
-  <Button type="primary" @click.native="submitData">保存</Button>
+  <Button type="primary" @click.native="submitData" :loading="save_loading">保存</Button>
   <Button type="ghost" @click.native="finishEdit('sys_user')" style="margin-left:15px;">取消</Button>
     </Form-item>
   </Form>
@@ -36,17 +41,29 @@ export default {
       if (data.orgids) {
         this.orgArr = data.orgids.split(",");
       }
+      if(data.roleids){
+         let temp = data.roleids.split(",");
+         temp.forEach((value,index)=>{
+           this.roleArr.push(parseInt(value));
+         });
+      }
     });
   },
   computed: {
-    options(){
+    options() {
       return this.$store.state.orgList;
+    },
+    roleList(){
+      return this.$store.state.roleList;
     }
   },
   methods: {
+    changerole: function(val){
+      this.form.roleids = val.join(",");
+    },
     orgTreeChange: function(val) {
       this.form.orgids = val.join(",");
-      this.form.orgid = val[val.length-1];
+      this.form.orgid = val[val.length - 1];
     }
   },
   data() {
@@ -106,8 +123,10 @@ export default {
         password1: "",
         id: "",
         orgid: 0,
-        orgids: ""
+        orgids: "",
+        roleids:""
       },
+      roleArr:[],
       orgArr: [],
       name: "sysedit_user",
       prename: "sys_user",

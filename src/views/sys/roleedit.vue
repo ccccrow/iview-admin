@@ -1,17 +1,17 @@
 <template>
   <Card>
-  <Form :model="form" :label-width="80" :rules="rules" ref="form" style="width:50%;">
-    <Form-item label="角色名称" prop="rolename">
+  <Form :model="form" :label-width="120" :rules="rules" ref="form" style="width:50%;">
+    <Form-item label="角色名称：" prop="rolename">
       <Input v-model="form.rolename"></Input>
     </Form-item>
-    <Form-item label="角色代码" prop="rolecode">
+    <Form-item label="角色代码：" prop="rolecode">
       <Input v-model="form.rolecode"></Input>
     </Form-item>
-    <Form-item label="角色代码" prop="roledesc">
+    <Form-item label="角色描述：" prop="roledesc">
       <Input v-model="form.roledesc" type="textarea"></Input>
     </Form-item>
     <Form-item>
-  <Button type="primary" @click.native="submitData">保存</Button>
+  <Button type="primary" @click.native="submitData" :loading="save_loading">保存</Button>
   <Button type="ghost" @click.native="finishEdit('sys_role')" style="margin-left:15px;">取消</Button>
     </Form-item>
   </Form>

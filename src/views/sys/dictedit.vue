@@ -1,20 +1,20 @@
 <template>
   <Card>
-  <Form :model="form" :label-width="80" :rules="rules" ref="form" style="width:50%;">
-    <Form-item label="字典名称" prop="name">
+  <Form :model="form" :label-width="120" :rules="rules" ref="form" style="width:50%;">
+    <Form-item label="字典名称：" prop="name">
       <Input v-model="form.name"></Input>
     </Form-item>
-    <Form-item label="字典编码" prop="code">
+    <Form-item label="字典编码：" prop="code">
       <Input v-model="form.code"></Input>
     </Form-item>
-    <Form-item label="字典值" prop="value">
+    <Form-item label="字典值：" prop="value">
        <Input v-model="form.value" type="textarea"></Input>
     </Form-item>
-    <Form-item label="排序号" prop="sort" >
+    <Form-item label="排序号：" prop="sort" >
       <Input v-model="form.sort"></Input>
     </Form-item>
     <Form-item>
-  <Button type="primary" @click.native="submitData">保存</Button>
+  <Button type="primary" @click.native="submitData" :loading="save_loading">保存</Button>
   <Button type="ghost" @click.native="finishEdit('sys_dict')" style="margin-left:15px;">取消</Button>
     </Form-item>
   </Form>

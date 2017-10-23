@@ -5,7 +5,8 @@ import Bus from "./bus.js";
 export default {
   data(){
     return {
-      modstatus:false
+      modstatus:false,
+      save_loading:false
     }
   },
   computed:{
@@ -36,6 +37,7 @@ export default {
       var $this = this;
       $this.$refs.form.validate((valid) => {
         if (valid) {
+          $this.save_loading = true;
           $this.$http.post( $this.saveaction, $this.form)
             .then((response) => {
               var c = response.data.h.c;
@@ -46,6 +48,7 @@ export default {
               } else {
                 $this.$Message.error(response.data.h.m);
               }
+              $this.save_loading = false;
             })
         } else {
           return false;
@@ -62,7 +65,7 @@ export default {
               $this.form[key] = data[key];
             }
           }
-          Bus.$emit(this.callbackDataValue,$this.form);
+          Bus.$emit(this.callbackDataValue,data);
         })
     }
   },

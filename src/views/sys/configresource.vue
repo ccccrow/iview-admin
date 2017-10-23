@@ -27,6 +27,7 @@ export default {
       finishEdit(this,'sysresource_role');
     },
     saveConfig() {
+      this.save_loading = true;
       this.$http
         .post( "role/config", {
           resourceid: this.resourceid,
@@ -73,6 +74,7 @@ export default {
   },
   data() {
     return {
+      save_loading:false,
       resourceid: "",
       roleid: "",
       prename: "sys_role",

@@ -10,7 +10,7 @@
                 :filter-method="filterMethod" @on-change="handleChange"></Transfer>
         </Col>
         <Col span="24" style="text-align:center;margin-top:10px;">
-            <Button type="primary" @click.native="saveUser">保存</Button>
+            <Button type="primary" @click.native="saveUser" :loading="save_loading">保存</Button>
             <Button type="ghost" @click.native="cancel" style="margin-left:15px;">取消</Button>
         </Col>
       </Row>
@@ -41,6 +41,7 @@ export default {
       this.userlist = newTargetKeys;
     },
     saveUser() {
+      this.save_loading = true;
       let userid = "";
       for (var i in this.userlist) {
         userid = userid + "," + this.userlist[i];
@@ -97,6 +98,7 @@ export default {
   },
   data() {
     return {
+      save_loading:false,
       listStyle: {
         width: "45%",
         height: "400px"

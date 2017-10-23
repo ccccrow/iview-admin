@@ -1,22 +1,22 @@
 <template>
   <Card>
-  <Form :model="form" :label-width="80" :rules="rules" ref="form" style="width:50%;">
-    <Form-item label="资源名称" prop="resourcename">
+  <Form :model="form" :label-width="120" :rules="rules" ref="form" style="width:50%;">
+    <Form-item label="资源名称：" prop="resourcename">
       <Input v-model="form.resourcename"></Input>
     </Form-item>
-    <Form-item label="资源编码" prop="resourcecode">
+    <Form-item label="资源编码：" prop="resourcecode">
       <Input v-model="form.resourcecode"></Input>
     </Form-item>
-    <Form-item label="资源类型" prop="resourcetype">
+    <Form-item label="资源类型：" prop="resourcetype">
       <Select v-model="form.resourcetype" style="width:200px">
         <Option v-for="item in options" :value="item.value" :key="item.value">{{ item.label }}</Option>
     </Select>
     </Form-item>
-    <Form-item label="排序号" prop="sort" >
+    <Form-item label="排序号：" prop="sort" >
       <Input v-model="form.sort"></Input>
     </Form-item>
     <Form-item>
-  <Button type="primary" @click.native="submitData">保存</Button>
+  <Button type="primary" @click.native="submitData" :loading="save_loading">保存</Button>
   <Button type="ghost" @click.native="finishEdit('sys_resource')" style="margin-left:15px;">取消</Button>
     </Form-item>
   </Form>

@@ -152,6 +152,10 @@ export default {
         this.processoptions(o);
         this.$store.commit("initOrg", o);
       });
+      this.$http.post("role/query/list").then(response => {
+        let r = response.data.b;
+        this.$store.commit("initRole", r);
+      });
       this.$store.commit("setCurrentPageName", this.$route.name);
       let pathArr = util.setCurrentPath(this, this.$route.name);
       if (pathArr.length >= 2) {
