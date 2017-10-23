@@ -144,7 +144,7 @@ export const locking = {
 
 export const appRouter = [{
     path: '/sys',
-    icon: 'key',
+    icon: 'cube',
     name: 'sys',
     title: '系统管理',
     component: Main,

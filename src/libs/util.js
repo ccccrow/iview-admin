@@ -4,7 +4,7 @@ let util = {
 
 };
 util.title = function (title) {
-    title = title || 'iView admin';
+    title = title || 'Admin后台管理系统';
     window.document.title = title;
 };
 
