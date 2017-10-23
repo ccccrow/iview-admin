@@ -104,10 +104,18 @@ export default {
   },
   methods: {
     configresource(params) {
-      util.openPage(this, "sysresource_role", "配置资源", params);
+      params.title = "配置资源"
+      util.openNewPage(this, "sysresource_role", params);
+      this.$router.push({
+        name: "sysresource_role",
+        params:params});
     },
     configuser(params) {
-      util.openPage(this, "sysuser_role", "配置用户", params);
+      params.title = "配置用户"
+      util.openNewPage(this, "sysuser_role", params);
+      this.$router.push({
+        name: "sysuser_role",
+        params:params});
     }
   }
 };

@@ -1,6 +1,7 @@
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin')
 const merge = require('webpack-merge');
 const webpackBaseConfig = require('./webpack.base.config.js');
 const fs = require('fs');
@@ -39,6 +40,11 @@ module.exports = merge(webpackBaseConfig, {
             filename: '../index_prod.html',
             template: './src/template/index.ejs',
             inject: false
-        })
+        }),
+        new CopyWebpackPlugin([{
+            from: path.resolve(__dirname, '../static'),
+            to: 'static',
+            ignore: ['.*']
+        }])
     ]
 });

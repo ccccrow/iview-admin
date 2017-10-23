@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import iView from 'iview';
 import axios from 'axios';
+import Qs from 'qs'
 import VueRouter from 'vue-router';
 import {routers, otherRouter, appRouter,editRouter} from './router';
 import Vuex from 'vuex';
@@ -15,6 +16,7 @@ import zhLocale from 'iview/src/locale/lang/zh-CN';
 import enLocale from 'iview/src/locale/lang/en-US';
 axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded'
 axios.defaults.baseURL = "http://localhost:8091/"
+Vue.prototype.$http = axios
 Vue.use(VueRouter);
 Vue.use(Vuex);
 Vue.use(VueI18n);
@@ -112,8 +114,10 @@ const store = new Vuex.Store({
             ...appRouter,
             ...editRouter
         ],
+        orgList:[],
         menuList: [],
         tagsList: [...otherRouter.children],
+        prePage: '',
         pageOpenedList: [],
         currentPageName: '',
         currentPath: [
@@ -132,6 +136,9 @@ const store = new Vuex.Store({
 
     },
     mutations: {
+        initOrg(state, list) {
+            state.orgList.push(...list);
+        },
         setTagsList (state, list) {
             state.tagsList.push(...list);
         },
@@ -147,11 +154,13 @@ const store = new Vuex.Store({
             state.pageOpenedList.push(tagObj);
         },
         initCachepage (state) {
-            state.cachePage = JSON.parse(localStorage.pageOpenedList).map(item => {
-                if (item.name !== 'home_index') {
-                    return item.name;
-                }
-            });
+            if(localStorage.pageOpenedList){
+                state.cachePage = JSON.parse(localStorage.pageOpenedList).map(item => {
+                    if (item.name !== 'home_index') {
+                        return item.name;
+                    }
+                });
+            }
         },
         removeTag (state, name) {
             state.pageOpenedList.map((item, index) => {

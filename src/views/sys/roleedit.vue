@@ -12,7 +12,7 @@
     </Form-item>
     <Form-item>
   <Button type="primary" @click.native="submitData">保存</Button>
-  <Button type="ghost" @click.native="finishEdit" style="margin-left:15px;">取消</Button>
+  <Button type="ghost" @click.native="finishEdit('sys_role')" style="margin-left:15px;">取消</Button>
     </Form-item>
   </Form>
   </Card>
@@ -30,6 +30,7 @@ export default {
         roledesc: "",
         id: ""
       },
+      prename: "sys_role",
       name: "sysedit_role",
       module: "role",
       rules: {

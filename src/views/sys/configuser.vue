@@ -29,7 +29,7 @@ export default {
   },
   methods: {
     cancel(){
-      finishEdit(this,'sysuser_role');
+      finishEdit(this,'sysuser_role','sys_role');
     },
     orgClick(obj, node) {
       this.orgid = node.data.value;
@@ -101,6 +101,7 @@ export default {
         width: "45%",
         height: "400px"
       },
+      prename: "sys_role",
       userlist: [],
       list: [],
       nouserlist: [],

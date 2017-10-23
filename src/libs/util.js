@@ -192,10 +192,12 @@ util.openNewPage = function (vm, name, argu) {
         tag = tag.children ? tag.children[0] : tag;
         if (argu) {
             tag.argu = argu;
+            tag.title = argu.title;
         }
         vm.$store.commit('increateTag', tag);
         localStorage.pageOpenedList = JSON.stringify(vm.$store.state.pageOpenedList); // 本地存储已打开页面
     }
     vm.$store.commit('setCurrentPageName', name);
 };
+
 export default util;

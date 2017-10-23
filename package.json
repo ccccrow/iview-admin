@@ -70,6 +70,7 @@
     "vue-template-compiler": "^2.5.2",
     "webpack": "^2.2.1",
     "webpack-dev-server": "^2.9.2",
-    "webpack-merge": "^3.0.0"
+    "webpack-merge": "^3.0.0",
+    "copy-webpack-plugin": "^4.0.1"
   }
 }

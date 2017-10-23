@@ -17,7 +17,7 @@
     </Form-item>
     <Form-item>
   <Button type="primary" @click.native="submitData">保存</Button>
-  <Button type="ghost" @click.native="finishEdit" style="margin-left:15px;">取消</Button>
+  <Button type="ghost" @click.native="finishEdit('sys_resource')" style="margin-left:15px;">取消</Button>
     </Form-item>
   </Form>
   </Card>
@@ -75,6 +75,7 @@ export default {
           label: "菜单"
         }
       ],
+      prename: "sys_resource",
       name: "sysedit_resource",
       module: "resource",
       rules: {

@@ -36,7 +36,7 @@ export default {
           var c = response.data.h.c;
           if (c == "0") {
             this.$Message.success(response.data.h.m);
-            finishEdit(this,'sysresource_role');
+            finishEdit(this,'sysresource_role','sys_role');
           } else {
             this.$Message.error(response.data.h.m);
           }
@@ -75,6 +75,7 @@ export default {
     return {
       resourceid: "",
       roleid: "",
+      prename: "sys_role",
       setting: {
         check: {
           enable: true,
