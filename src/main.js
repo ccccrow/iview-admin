@@ -1,7 +1,8 @@
 import Vue from 'vue';
 import iView from 'iview';
+import axios from 'axios';
 import VueRouter from 'vue-router';
-import {routers, otherRouter, appRouter} from './router';
+import {routers, otherRouter, appRouter,editRouter} from './router';
 import Vuex from 'vuex';
 import Util from './libs/util';
 import App from './app.vue';
@@ -12,12 +13,43 @@ import VueI18n from 'vue-i18n';
 import Locales from './locale';
 import zhLocale from 'iview/src/locale/lang/zh-CN';
 import enLocale from 'iview/src/locale/lang/en-US';
-
+axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded'
+axios.defaults.baseURL = "http://localhost:8091/"
 Vue.use(VueRouter);
 Vue.use(Vuex);
 Vue.use(VueI18n);
 Vue.use(iView);
-
+axios.interceptors.request.use(function (config) { // 这里的config包含每次请求的内容
+    iView.LoadingBar.start();
+    let token = sessionStorage.getItem("token");
+    if (token) {
+        config.headers.token = token;
+    }
+    config.data = Qs.stringify(config.data)
+    return config;
+}, function (err) {
+    return Promise.reject(err);
+});
+axios.interceptors.response.use(
+    response => {
+        iView.LoadingBar.finish();
+        if (response.data["h"]) {
+            var c = response.data.h.c;
+            if (c == 1000) {
+                router.push("/login");
+            }
+        }
+        return response;
+    },
+    error => {
+        if (error.response) {
+            switch (error.response.status) {
+                case 401:
+                    router.push("/login");
+            }
+        }
+        return Promise.reject(error.response.data) // 返回接口返回的错误信息
+    });
 // 自动设置语言
 const navLang = navigator.language;
 const localLang = (navLang === 'zh-CN' || navLang === 'en-US') ? navLang : false;
@@ -41,6 +73,7 @@ const RouterConfig = {
 const router = new VueRouter(RouterConfig);
 
 router.beforeEach((to, from, next) => {
+    let user = JSON.parse(sessionStorage.getItem('user'));
     iView.LoadingBar.start();
     Util.title(to.meta.title);
     if (Cookies.get('locking') === '1' && to.name !== 'locking') {  // 判断当前是否是锁定状态
@@ -53,11 +86,11 @@ router.beforeEach((to, from, next) => {
         iView.LoadingBar.finish();
         next(false);
     } else {
-        if (!Cookies.get('user') && to.name !== 'login') {  // 判断是否已经登录且前往的页面不是登录页
+        if (!user && to.name !== 'login') {  // 判断是否已经登录且前往的页面不是登录页
             next({
                 name: 'login'
             });
-        } else if (Cookies.get('user') && to.name === 'login') {  // 判断是否已经登录且前往的是登录页
+        } else if (user && to.name === 'login') {  // 判断是否已经登录且前往的是登录页
             next({
                 name: 'home'
             });
@@ -76,7 +109,8 @@ const store = new Vuex.Store({
     state: {
         routers: [
             otherRouter,
-            ...appRouter
+            ...appRouter,
+            ...editRouter
         ],
         menuList: [],
         tagsList: [...otherRouter.children],
@@ -277,5 +311,14 @@ new Vue({
             }
         });
         this.$store.commit('setTagsList', tagsList);
+        let eidtTagsList = [];
+        editRouter.map((item) => {
+            if (item.children.length <= 1) {
+                eidtTagsList.push(item.children[0]);
+            } else {
+                eidtTagsList.push(...item.children);
+            }
+        });
+        this.$store.commit('setTagsList', eidtTagsList);
     }
 });
