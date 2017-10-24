@@ -10,7 +10,8 @@ export default {
       total: 0,
       tableData: [],
       currentpage: 1,
-      pagesize: 10
+      pagesize: 10,
+      yesnoname: ['是','否']
     }
   },
   created() {

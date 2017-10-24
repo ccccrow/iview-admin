@@ -89,6 +89,19 @@ export const editRouter = [{
             require(['./views/sys/configuser.vue'], resolve);
         }
     }]
+},{
+    path: '/cmsedit',
+    icon: 'key',
+    name: 'cmsedit',
+    title: '内容管理',
+    component: Main,children: [{
+        path: 'site/:id',
+        title: '编辑站点',
+        name: 'cmsedit_site',
+        component: resolve => {
+            require(['./views/cms/config/siteedit.vue'], resolve);
+        }
+    }]
 }]
 export const page500 = {
     path: '/500',
@@ -199,6 +212,33 @@ export const appRouter = [{
             }
         }
     ]
+},{
+    path: '/cms',
+    icon: 'cube',
+    name: 'config',
+    title: '配置管理',
+    component: Main,
+    children: [{
+        path: 'global',
+        title: '全局设置',
+        name: 'cms_global',
+        component: resolve => {
+            require(['./views/cms/config/configglobal.vue'], resolve);
+        },
+        meta: {
+            keepAlive: true // 需要被缓存
+        }
+    },{
+        path: 'site',
+        title: '站点设置',
+        name: 'cms_site',
+        component: resolve => {
+            require(['./views/cms/config/site.vue'], resolve);
+        },
+        meta: {
+            keepAlive: true // 需要被缓存
+        }
+    }]
 }];
 
 export const routers = [

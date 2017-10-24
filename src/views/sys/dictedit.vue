@@ -15,7 +15,7 @@
     </Form-item>
     <Form-item>
   <Button type="primary" @click.native="submitData" :loading="save_loading">保存</Button>
-  <Button type="ghost" @click.native="finishEdit('sys_dict')" style="margin-left:15px;">取消</Button>
+  <Button type="ghost" @click.native="finishEdit()" style="margin-left:15px;">取消</Button>
     </Form-item>
   </Form>
   </Card>
