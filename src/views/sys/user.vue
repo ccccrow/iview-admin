@@ -35,7 +35,7 @@ export default {
     return {
       module: "user",
       name: "sysedit_user",
-      chname:"用户",
+      chname: "用户",
       searchform: {
         username: "",
         realname: ""
@@ -80,11 +80,11 @@ export default {
         {
           title: "创建时间",
           key: "createtime",
-          width:200
+          width: 200
         },
         {
           title: "操作",
-          width:200,
+          width: 200,
           render: this.renderop
         }
       ]

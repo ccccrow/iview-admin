@@ -2,16 +2,20 @@
  * Created by yk on 2017/2/13.
  */
 import Bus from "./bus.js";
-import {editButton,deleteButton} from "./common"
+import {
+  editButton,
+  deleteButton
+} from "./common"
 import util from "./util.js";
 export default {
   data() {
     return {
       total: 0,
+      test: '',
       tableData: [],
       currentpage: 1,
       pagesize: 10,
-      yesnoname: ['是','否']
+      yesnoname: ['是', '否']
     }
   },
   created() {
@@ -37,37 +41,40 @@ export default {
     this.getData();
   },
   methods: {
-    checkroles(sr){
+    checkroles(sr) {
       var r = sessionStorage.getItem("r");
-     if (r && r.indexOf(sr) != -1) {
-       return true;
-     } else {
-       return false;
-     }
-   },
+      if (r && r.indexOf(sr) != -1) {
+        return true;
+      } else {
+        return false;
+      }
+    },
     renderop(h, params) {
       let currentRowData = this.tableData[params.index];
       let op = [];
-      if(this.checkroles(this.module+"save")){
+      if (this.checkroles(this.module + "save")) {
         op.push(editButton(this, h, currentRowData, params.index))
       }
-      if(this.checkroles(this.module+"delete")){
+      if (this.checkroles(this.module + "delete")) {
         op.push(deleteButton(this, h, currentRowData, params.index))
       }
       return h('div', op)
     },
-    add(){
-      this.edit({"id":"new"})
+    add() {
+      this.edit({
+        "id": "new"
+      })
     },
-    edit(params,title) {
-      if(!title){
-        title = (params.id==="new"?"新增":"编辑")+this.chname;
+    edit(params, title) {
+      if (!title) {
+        title = (params.id === "new" ? "新增" : "编辑") + this.chname;
       }
       params.title = title;
-      util.openNewPage(this, this.name,params);
+      util.openNewPage(this, this.name, params);
       this.$router.push({
         name: this.name,
-        params:params});
+        params: params
+      });
     },
     resetForm(name) {
       this.$refs[name].resetFields();
@@ -128,7 +135,7 @@ export default {
           if (response.data.h.c == "0") {
             _this.$Message.success('删除成功!');
             _this.getData();
-            if(_this.deleteCallback){
+            if (_this.deleteCallback) {
               _this.deleteCallback();
             }
           } else {
