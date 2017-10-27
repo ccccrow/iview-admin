@@ -2,6 +2,7 @@
  * Created by yk on 2017/2/13.
  */
 import Bus from "./bus.js";
+import Cookies from "js-cookie";
 import {
   editButton,
   deleteButton
@@ -42,7 +43,7 @@ export default {
   },
   methods: {
     checkroles(sr) {
-      var r = sessionStorage.getItem("r");
+      var r = Cookies.get("r");
       if (r && r.indexOf(sr) != -1) {
         return true;
       } else {
@@ -81,10 +82,10 @@ export default {
       this.getData();
     },
     getUser() {
-      return JSON.parse(sessionStorage.getItem("user"))
+      return JSON.parse(Cookies.get("user"))
     },
     checkroles(sr) {
-      var r = sessionStorage.getItem("r");
+      var r = Cookies.get("r");
       if (r && r.indexOf(sr) != -1) {
         return true;
       } else {

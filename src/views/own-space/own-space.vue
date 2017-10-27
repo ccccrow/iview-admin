@@ -62,6 +62,7 @@
 </template>
 
 <script>
+import Cookies from "js-cookie";
 export default {
   name: "own-space",
   data() {
@@ -202,7 +203,7 @@ export default {
     }
   },
   mounted() {
-    let user = JSON.parse(sessionStorage.getItem("user"));
+    let user = JSON.parse(Cookies.get("user"));
     this.form.id = user.id;
     this.form.username = user.username;
     this.form.realname = user.realname;

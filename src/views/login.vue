@@ -62,12 +62,12 @@ export default {
             })
             .then(response => {
               if (response.data.h.c == "0") {
-                sessionStorage.setItem(
+                Cookies.set(
                   "user",
                   JSON.stringify(response.data.b.user)
                 );
-                sessionStorage.setItem("token", response.data.h.token);
-                sessionStorage.setItem("r", response.data.b.user.resources);
+                Cookies.set("token", response.data.h.token);
+                Cookies.set("r", response.data.b.user.resources);
                 this.$router.push({
                   name: "home_index"
                 });

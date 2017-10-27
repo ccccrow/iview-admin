@@ -161,7 +161,7 @@ export default {
       if (pathArr.length >= 2) {
         this.$store.commit("addOpenSubmenu", pathArr[1].name);
       }
-      let user = JSON.parse(sessionStorage.getItem("user"));
+      let user = JSON.parse(Cookies.get("user"));
       this.userName = user.username;
       let messageCount = 3;
       this.messageCount = messageCount.toString();
@@ -181,8 +181,8 @@ export default {
         Cookies.remove("password");
         Cookies.remove("hasGreet");
         Cookies.remove("access");
-        sessionStorage.removeItem("user");
-        sessionStorage.removeItem("json");
+        Cookies.remove("user");
+        Cookies.remove("json");
         this.$Notice.close("greeting");
         this.$store.commit("clearOpenedSubmenu");
         // 回复默认样式

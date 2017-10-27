@@ -2,6 +2,7 @@
  * Created by yk on 2017/2/13.
  */
 import Bus from "./bus.js";
+import Cookies from "js-cookie";
 export default {
   data(){
     return {
@@ -25,7 +26,7 @@ export default {
   },
   methods: {
     getUser () {
-      return JSON.parse(sessionStorage.getItem("user"))
+      return JSON.parse(Cookies.get("user"))
     },
     finishEdit(){
       this.$store.commit('removeTag', this.name);

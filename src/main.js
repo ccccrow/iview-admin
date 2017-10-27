@@ -23,7 +23,7 @@ Vue.use(VueI18n);
 Vue.use(iView);
 axios.interceptors.request.use(function (config) { // 这里的config包含每次请求的内容
     iView.LoadingBar.start();
-    let token = sessionStorage.getItem("token");
+    let token = Cookies.get("token");
     if (token) {
         config.headers.token = token;
     }
@@ -75,7 +75,7 @@ const RouterConfig = {
 const router = new VueRouter(RouterConfig);
 
 router.beforeEach((to, from, next) => {
-    let user = JSON.parse(sessionStorage.getItem('user'));
+    let user = Cookies.get('user');
     iView.LoadingBar.start();
     Util.title(to.meta.title);
     if (Cookies.get('locking') === '1' && to.name !== 'locking') {  // 判断当前是否是锁定状态
