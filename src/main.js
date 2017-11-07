@@ -9,7 +9,11 @@ import Util from './libs/util';
 import App from './app.vue';
 import Cookies from 'js-cookie';
 import 'iview/dist/styles/iview.css';
+import 'video.js/dist/video-js.css'
+import 'vue-video-player/src/custom-theme.css'
 
+import VueVideoPlayer from 'vue-video-player'
+Vue.use(VueVideoPlayer)
 import VueI18n from 'vue-i18n';
 import Locales from './locale';
 import zhLocale from 'iview/src/locale/lang/zh-CN';
