@@ -7,7 +7,17 @@ export default {
   data(){
     return {
       modstatus:false,
-      save_loading:false
+      save_loading:false,
+      statuslist: [
+        {
+          value: 1,
+          label: '启用'
+        },
+        {
+          value: 0,
+          label: '停用'
+        }
+      ]
     }
   },
   computed:{

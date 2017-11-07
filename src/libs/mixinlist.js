@@ -53,12 +53,12 @@ export default {
     renderop(h, params) {
       let currentRowData = this.tableData[params.index];
       let op = [];
-      if (this.checkroles(this.module + "save")) {
+      //if (this.checkroles(this.module + "save")) {
         op.push(editButton(this, h, currentRowData, params.index))
-      }
-      if (this.checkroles(this.module + "delete")) {
+      //}
+      //if (this.checkroles(this.module + "delete")) {
         op.push(deleteButton(this, h, currentRowData, params.index))
-      }
+      //}
       return h('div', op)
     },
     add() {

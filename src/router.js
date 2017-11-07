@@ -90,16 +90,66 @@ export const editRouter = [{
         }
     }]
 },{
-    path: '/cmsedit',
+    path: '/ivcedit',
     icon: 'key',
-    name: 'cmsedit',
-    title: '内容管理',
+    name: 'ivcedit',
+    title: '管理',
     component: Main,children: [{
-        path: 'site/:id',
-        title: '编辑站点',
-        name: 'cmsedit_site',
+        path: 'goodstype/:id',
+        title: '编辑分类',
+        name: 'ivcedit_goodstype',
         component: resolve => {
-            require(['./views/cms/config/siteedit.vue'], resolve);
+            require(['./views/ivc/goods/goodstypeedit.vue'], resolve);
+        }
+    },{
+        path: 'brand/:id',
+        title: '编辑品牌',
+        name: 'ivcedit_brand',
+        component: resolve => {
+            require(['./views/ivc/goods/brandedit.vue'], resolve);
+        }
+    },{
+        path: 'spec/:id',
+        title: '编辑',
+        name: 'ivcedit_spec',
+        component: resolve => {
+            require(['./views/ivc/goods/specedit.vue'], resolve);
+        }
+    },
+    {
+        path: 'spec/type/:specid',
+        title: '规格管理',
+        name: 'ivcspec_type',
+        component: resolve => {
+            require(['./views/ivc/goods/spectype.vue'], resolve);
+        }
+    },{
+        path: 'spectype/:id/:specid',
+        title: '编辑',
+        name: 'ivcedit_spectype',
+        component: resolve => {
+            require(['./views/ivc/goods/spectypeedit.vue'], resolve);
+        }
+    },{
+        path: 'store/:id',
+        title: '编辑',
+        name: 'ivcedit_store',
+        component: resolve => {
+            require(['./views/ivc/goods/storeedit.vue'], resolve);
+        }
+    },{
+        path: 'supplier/:id',
+        title: '编辑',
+        name: 'ivcedit_supplier',
+        component: resolve => {
+            require(['./views/ivc/goods/supplieredit.vue'], resolve);
+        }
+    },{
+        path: 'member/:id',
+        title: '编辑',
+        name: 'ivcedit_member',
+        component: resolve => {
+            require(['./views/ivc/goods/memberedit.vue'], resolve);
         }
     }]
 }]
@@ -213,27 +263,81 @@ export const appRouter = [{
         }
     ]
 },{
-    path: '/cms',
+    path: '/ivc',
     icon: 'cube',
-    name: 'config',
-    title: '配置管理',
+    name: 'goods',
+    title: '管理',
     component: Main,
     children: [{
-        path: 'global',
-        title: '全局设置',
-        name: 'cms_global',
+        path: 'goods',
+        title: '商品管理',
+        name: 'ivc_goods',
         component: resolve => {
-            require(['./views/cms/config/configglobal.vue'], resolve);
+            require(['./views/ivc/goods/goods.vue'], resolve);
+        },
+        meta: {
+            keepAlive: true // 需要被缓存
+        },
+        
+    },{
+        path: 'goodstype',
+        title: '分类管理',
+        name: 'ivc_goodstype',
+        component: resolve => {
+            require(['./views/ivc/goods/goodstype.vue'], resolve);
         },
         meta: {
             keepAlive: true // 需要被缓存
         }
     },{
-        path: 'site',
-        title: '站点设置',
-        name: 'cms_site',
+        path: 'brand',
+        title: '品牌管理',
+        name: 'ivc_brand',
         component: resolve => {
-            require(['./views/cms/config/site.vue'], resolve);
+            require(['./views/ivc/goods/brand.vue'], resolve);
+        },
+        meta: {
+            keepAlive: true // 需要被缓存
+        }
+    },{
+        path: 'spec',
+        title: '规格管理',
+        name: 'ivc_spec',
+        component: resolve => {
+            require(['./views/ivc/goods/spec.vue'], resolve);
+        },
+        meta: {
+            keepAlive: true // 需要被缓存
+        }
+    },
+    {
+        path: 'store',
+        title: '门店管理',
+        name: 'ivc_store',
+        component: resolve => {
+            require(['./views/ivc/goods/store.vue'], resolve);
+        },
+        meta: {
+            keepAlive: true // 需要被缓存
+        }
+    },
+    {
+        path: 'supplier',
+        title: '供应商管理',
+        name: 'ivc_supplier',
+        component: resolve => {
+            require(['./views/ivc/goods/supplier.vue'], resolve);
+        },
+        meta: {
+            keepAlive: true // 需要被缓存
+        }
+    },
+    {
+        path: 'member',
+        title: '会员管理',
+        name: 'ivc_member',
+        component: resolve => {
+            require(['./views/ivc/goods/member.vue'], resolve);
         },
         meta: {
             keepAlive: true // 需要被缓存
