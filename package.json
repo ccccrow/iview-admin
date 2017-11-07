@@ -1,5 +1,5 @@
 {
-  "name": "admin",
+  "name": "iview-admin",
   "version": "1.1.1",
   "description": "a management bases on iview",
   "main": "index.js",
@@ -29,12 +29,9 @@
     "simplemde": "^1.11.2",
     "sortablejs": "^1.6.1",
     "tinymce": "^4.7.1",
-    "video.js": "^6.2.4",
-    "videojs-flash": "^2.0.1",
     "vue": "^2.5.2",
     "vue-i18n": "^5.0.3",
     "vue-router": "^2.8.1",
-    "vue-video-player": "^4.0.4",
     "vuex": "^2.5.0"
   },
   "devDependencies": {
