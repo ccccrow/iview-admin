@@ -31,6 +31,7 @@ export default {
       module: "ivc/purchase",
       name: "ivcedit_purchase",
       chname: "进货单",
+      statusname:['草稿','已完成'],
       searchform: {
       },
       columns: [
@@ -39,21 +40,33 @@ export default {
           key: "id"
         },
         {
+          title: "实付金额",
+          key: "money",
+          render: (h, params) => {
+            return h(
+              "span",
+              {
+              },
+              params.row.money/100
+            );
+          }
+        },
+        {
           title: "日期",
           key: "purchasedate"
         },
         {
           title: "状态",
-          key: "specstatus",
+          key: "status",
           render: (h, params) => {
             return h(
               "span",
               {
                 style: {
-                  color: params.row.specstatus == 1 ? "red" : "blue"
+                  color: params.row.status == 1 ? "red" : "blue"
                 }
               },
-              this.statusname[params.row.specstatus]
+              this.statusname[params.row.status]
             );
           }
         },
