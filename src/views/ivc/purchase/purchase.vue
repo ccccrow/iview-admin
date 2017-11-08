@@ -4,15 +4,9 @@
       <Card>
     <Row >
       <Col span="24">
-        <FormItem label="商品" prop="goodsname">
-            <Input v-model="searchform.goodsname"></Input>
-        </FormItem>
-        <FormItem label="分类" prop="realname">
-            <Input v-model="searchform.realname"></Input>
-        </FormItem>
         <Button type="primary" icon="ios-search" @click.native="tablesearch">查询</Button>
         <Button type="primary" icon="refresh" @click.native="resetForm('searchform')">重置</Button>
-        <Button type="primary" icon="android-add" @click.native="add()">新增</Button>
+        <Button type="primary" icon="android-add" @click.native="add()">添加进货单</Button>
       </Col>
     </Row>
     </Card>
@@ -29,67 +23,37 @@
 </template>
 <script>
 import Mixin from "../../../libs/mixinlist";
+import util from "../../../libs/util";
 export default {
   mixins: [Mixin],
   data() {
     return {
-      module: "ivc/goods",
-      name: "ivcedit_goods",
-      chname: "商品",
+      module: "ivc/purchase",
+      name: "ivcedit_purchase",
+      chname: "进货单",
       searchform: {
-        goodsname: "",
-        goodstype: ""
       },
-      statusname: ["停用","启用"],
       columns: [
         {
           title: "id",
-          key: "id",
-          width:100
+          key: "id"
         },
         {
-          title: "名称",
-          key: "goodsname",
-          width:100
-        },
-        {
-          title: "货号",
-          key: "goodsno",
-          width:100
-        },
-        {
-          title: "品牌",
-          key: "brandname",
-          width:100
-        },
-        {
-          title: "分类",
-          key: "goodstypename",
-          width:100
-        },
-        {
-          title: "规格",
-          key: "specs",
-          width: 200,
-        },
-        {
-          title: "建议零售价",
-          key: "sgretailprice",
-          width:100
+          title: "日期",
+          key: "purchasedate"
         },
         {
           title: "状态",
-          key: "status",
-          width:100,
+          key: "specstatus",
           render: (h, params) => {
             return h(
               "span",
               {
                 style: {
-                  color: params.row.status == 0 ? "red" : "blue"
+                  color: params.row.specstatus == 1 ? "red" : "blue"
                 }
               },
-              this.statusname[params.row.status]
+              this.statusname[params.row.specstatus]
             );
           }
         },
@@ -100,12 +64,42 @@ export default {
         },
         {
           title: "操作",
-          width: 200,
-          fixed: 'right',
-          render: this.renderop
+          width: 250,
+          render: (h, params) => {
+            let currentRowData = this.tableData[params.index];
+            let op = this.renderop(h,params);
+            let vm = this;
+            op.children.push(h("Button",
+                {
+                  style:{
+                    marginLeft: "10px"
+                  },
+                  props: {
+                    type: "primary",
+                    size: "small"
+                  },
+                  on: {
+                    click: e => {
+                     vm.configspectype({ specid: currentRowData.id });
+                    }
+                  }
+                },
+                "规格管理"
+              ));
+              return op;
+          }
         }
       ]
     };
+  },
+  methods: {
+    configspectype(params) {
+      params.title = "规格详情"
+      util.openNewPage(this, "ivcspec_type", params);
+      this.$router.push({
+        name: "ivcspec_type",
+        params:params});
+    },
   }
 };
 </script>
