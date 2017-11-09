@@ -78,7 +78,7 @@
                 </Col>
                 <Col span="4" offset="1">
                     <Button type="primary" @click="selectspec(index)">选择</Button>
-                    <Button type="ghost" @click="handleRemove(index)">删除</Button>
+                    <Button type="ghost" @click="handleRemove(index)" v-if="index!=0">删除</Button>
                 </Col>
             </Row>
         </FormItem>
@@ -105,9 +105,10 @@
         </Form-item>
         </Col>
       </Row>
-      <Row>
+      <Row v-if="form.id==''">
         <Col span="24">
         <Form-item label="初使库存设置">
+          <Button type="primary" @click.native="showstock">点击初使化库存</Button>
         </Form-item>
         </Col>
       </Row>
@@ -120,46 +121,161 @@
         v-model="specmodal"
         title="选择规格"
         @on-ok="finishSpec">
-            <Select v-model="spec"  @on-change="changespec">
+            <Select v-model="spec"  @on-change="changespec" :disabled="specdisabled">
               <Option v-for="item in specList" :value="item.id" :key="item.id">{{ item.specname }}</Option>
           </Select>
           <Checkbox-group v-model="spectypeids"  @on-change="checkAllGroupChange" style="margin-top:10px;">
-              <Checkbox  size="large" :label="item.id" v-for="item in specTypeList"  :key="item.id"><span>{{item.spectypename}}</span></Checkbox>
+              <Checkbox  size="large" :disabled="item.disabled" :label="item.id" v-for="item in specTypeList"  :key="item.id"><span>{{item.spectypename}}</span></Checkbox>
           </Checkbox-group>
           <Checkbox
             :indeterminate="indeterminate"
             :value="checkAll"
             size="large"
             scrollable="true"
+            :disabled="checkAllDisabled"
              style="margin-top:10px;"
             @click.prevent.native="handleCheckAll" v-show="specTypeList.length>0">全选</Checkbox>
+    </Modal>
+    <Modal v-model="stockmodal" title="11">
+      <Row v-for="item in taglist" :key="item.name">
+        <Col span="24"> {{item.name}}：
+        <span class="tagspan" data-key="tags" v-for="subitem in item.sublist" :key="subitem.name" @click="clicktag" :data-specid="item.value"
+          :data-name="subitem.name" :data-value="subitem.value">{{subitem.name}}</span>
+        </Col>
+      </Row>
+      <Row>
+        <Col>
+        <Button type="primary" @click.native="addspec">添加</Button>
+        </Col>
+      </Row>
+      <Row>
+        <Col span="24" style="font-size:14px;">
+          <Table :columns="columns" :data="tableData" stripe></Table>
+        </Col>
+      </Row>
+      <p slot="footer">
+        <Button type="ghost" @click.native="closestock">取消</Button>
+        <Button type="primary" @click.native="savestock">保存</Button>
+      </p>
     </Modal>
   </Card>
   </div>
 </template>
+<style scoped lang="css">
+.tagspan {
+  color: white;
+  display: inline-block;
+  margin: 5px;
+  cursor: pointer;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  padding: 2px 5px;
+  background-color: #2b85e4;
+}
+</style>
 <script>
 import Mixin from "../../../libs/mixindata";
 import Bus from "../../../libs/bus";
 export default {
   mixins: [Mixin],
   created() {
-    Bus.$on(this.callbackDataValue, data => {
-      this.queryGoodsType(data);
+    if (this.form.id == "") {
+      this.queryGoodsType();
       this.queryBrand();
-      this.querySpec(data);
+      this.querySpec();
+    }
+    Bus.$on(this.callbackDataValue, data => {
       let spectypeids = data.spectypeid.split(";");
       let specs = data.specs.split(";");
       let specids = data.specid.split(";");
+      let specnames = data.specname.split(";");
       this.form.spectypeids = [];
       this.form.specids = [];
+      this.form.specnames = [];
       specs.forEach((value, index) => {
         this.form.items.push({ value: value });
         this.form.spectypeids.push(spectypeids[index]);
         this.form.specids.push(specids[index]);
+        this.form.specnames.push(specnames[index]);
+        this.disablespectypes.push(
+          ...spectypeids[index].split(",").map(s => +s)
+        );
       });
+      this.queryGoodsType(data);
+      this.queryBrand();
+      this.querySpec(data);
     });
   },
   methods: {
+    closestock() {
+      this.stockmodal = false;
+      this.tableData = [];
+    },
+    savestock() {
+      this.stockmodal = false;
+    },
+    clicktag(event) {
+      let target = event.toElement;
+      let dataset = target.dataset;
+      let name = dataset.name;
+      let value = dataset.value;
+      let specid = dataset.specid;
+      document
+        .querySelectorAll("[data-specid='" + specid + "']")
+        .forEach((value, index) => {
+          value.style.backgroundColor = "#2b85e4";
+        });
+      this.spectypenamestr = "";
+      this.spectypeidstr = "";
+      target.style.backgroundColor = "red";
+      this.$set(this.spectypename, specid, name);
+      this.$set(this.spectypeid, specid, value);
+      for (let key in this.spectypename) {
+        this.spectypenamestr =
+          this.spectypenamestr + "," + this.spectypename[key];
+      }
+      this.spectypenamestr = this.spectypenamestr.substring(1);
+      for (let key in this.spectypeid) {
+        this.spectypeidstr = this.spectypeidstr + "," + this.spectypeid[key];
+      }
+      this.spectypeidstr = this.spectypeidstr.substring(1);
+    },
+    addspec() {
+      this.tableData.forEach((value, index) => {});
+      this.tableData.push({
+        spectypeid: this.spectypeidstr,
+        spectypename: this.spectypenamestr,
+        goodscount: 0
+      });
+      console.log(this.tableData);
+    },
+    showstock() {
+      this.stockmodal = true;
+      this.taglist = [];
+      let spectypeids = this.form.spectypeids;
+      let specids = this.form.specids;
+      let items = this.form.items;
+      let specnames = this.form.specnames;
+      specids.forEach((value, index) => {
+        let itemvalue = items[index].value.split(",");
+        let spectypeid = spectypeids[index].split(",");
+        let sublist = [];
+        itemvalue.forEach((itemvalue, itemindex) => {
+          sublist.push({
+            name: itemvalue,
+            value: spectypeid[index]
+          });
+        });
+        this.taglist.push({
+          name: specnames[index],
+          sublist: sublist,
+          value: value
+        });
+      });
+      console.log(this.form.spectypeids);
+      console.log(this.form.specids);
+      console.log(this.form.items);
+    },
     finishSpec() {
       let spectypenames = [];
       let $this = this;
@@ -173,11 +289,26 @@ export default {
       this.form.items[this.itemindex].value = spectypenames.join(",");
       this.form.spectypeids[this.itemindex] = this.spectypeids.join(",");
       this.form.specids[this.itemindex] = this.spec;
+      this.specList.forEach((value, index) => {
+        if (this.spec == value.id) {
+          this.form.specnames[this.itemindex] = value.specname;
+        }
+      });
     },
     selectspec(index) {
       this.specmodal = true;
       this.itemindex = index;
+      alert(this.specList.length)
       this.spec = this.specList[index].id;
+      if (this.form.items[this.itemindex].value == "") {
+        this.spectypeids = [];
+        this.indeterminate = false;
+        this.checkAll = false;
+        this.specdisabled = false;
+        this.checkAllDisabled = false;
+      }else{
+        this.specdisabled = true;
+      }
     },
     queryGoodsType(data) {
       let $this = this;
@@ -185,24 +316,28 @@ export default {
         let o = response.data.b;
         this.processoptions(o);
         this.goodstypelist = o;
-        $this.$nextTick(() => {
-          $this.goodstypeArr = data.goodstypeids.split(",");
-        });
+        if (data) {
+          $this.$nextTick(() => {
+            $this.goodstypeArr = data.goodstypeids.split(",");
+          });
+        }
       });
     },
     handleCheckAll() {
-      if (this.indeterminate) {
-        this.checkAll = false;
-      } else {
-        this.checkAll = !this.checkAll;
-      }
-      this.indeterminate = false;
-      if (this.checkAll) {
-        this.spectypeids = this.specTypeList.map((value, index) => {
-          return value.id;
-        });
-      } else {
-        this.spectypeids = [];
+      if (!this.checkAllDisabled) {
+        if (this.indeterminate) {
+          this.checkAll = false;
+        } else {
+          this.checkAll = !this.checkAll;
+        }
+        this.indeterminate = false;
+        if (this.checkAll) {
+          this.spectypeids = this.specTypeList.map((value, index) => {
+            return value.id;
+          });
+        } else {
+          this.spectypeids = [];
+        }
       }
     },
     checkAllGroupChange(data) {
@@ -221,12 +356,12 @@ export default {
       this.form.items.push({
         value: ""
       });
-      this.form.spectypeids.push({});
+      this.form.spectypeids.push("");
     },
     handleRemove(index) {
       this.form.items.splice(index, 1);
-      this.form.spectypeids.splice(index,1);
-      this.form.specids.splice(index,1);
+      this.form.spectypeids.splice(index, 1);
+      this.form.specids.splice(index, 1);
     },
     queryBrand() {
       this.$http.post("ivc/brand/query/list", {}).then(response => {
@@ -246,9 +381,27 @@ export default {
         .post("ivc/specType/query/list", { specid: specid })
         .then(response => {
           let o = response.data.b;
-          $this.specTypeList = o;
+          $this.specTypeList = o; //如果是查询出来的已配置完的商品规格，需要禁用选择
+          console.log($this.disablespectypes);
+          $this.specTypeList.forEach((value, index) => {
+            let flag = false;
+            $this.disablespectypes.forEach((subvalue, subindex) => {
+              if (subvalue == value.id) {
+                flag = true;
+                return;
+              }
+            });
+            value["disabled"] = flag;
+            if (flag) {
+              this.checkAllDisabled = true;
+            }
+          });
           this.$nextTick(() => {
-            this.spectypeids = this.form.spectypeids[this.itemindex].split(",").map(s=>+s);
+            if (this.form.spectypeids[this.itemindex]) {
+              this.spectypeids = this.form.spectypeids[this.itemindex]
+                .split(",")
+                .map(s => +s);
+            }
           });
         });
     },
@@ -275,10 +428,45 @@ export default {
     onchange(val) {
       this.form.goodstypeids = val.join(",");
       this.form.goodstypeid = val[val.length - 1];
+    },
+    submitData() {
+      var $this = this;
+      this.tableData.forEach((value, index) => {
+        this.form.stockspectypeids = value.spectypeid;
+        this.form.stockspectypenames = value.spectypename;
+        this.form.stockgoodscount = value.goodscount;
+      });
+      $this.$refs.form.validate(valid => {
+        if (valid) {
+          $this.save_loading = true;
+          $this.$http.post($this.saveaction, $this.form).then(response => {
+            var c = response.data.h.c;
+            if (c == "0") {
+              $this.$Message.success(response.data.h.m);
+              Bus.$emit(this.getDataValue);
+              $this.finishEdit();
+            } else {
+              $this.$Message.error(response.data.h.m);
+            }
+            $this.save_loading = false;
+          });
+        } else {
+          return false;
+        }
+      });
     }
   },
   data() {
     return {
+      specdisabled: false,
+      checkAllDisabled: false,
+      disablespectypes: [], //需要禁用选择的规格
+      spectypename: {},
+      spectypenamestr: "",
+      spectypeid: {},
+      spectypeidstr: "",
+      stockmodal: false,
+      taglist: [],
       indeterminate: true,
       checkAll: false,
       spectypenames: "",
@@ -305,10 +493,14 @@ export default {
         goodstypeids: "",
         spectypeids: [],
         specids: [],
+        specnames: [],
         items: [],
         brandid: 0,
         seq: 0,
-        id: ""
+        id: "",
+        stockspectypeids: [], //库存需要
+        stockspectypenames: [], //库存需要
+        stockgoodscount: [] //库存需要
       },
       prename: "ivc_goods",
       name: "ivcedit_goods",
@@ -321,7 +513,31 @@ export default {
             trigger: "blur"
           }
         ]
-      }
+      },
+      columns: [
+        {
+          title: "规格",
+          key: "spectypename"
+        },
+        {
+          title: "数量",
+          key: "goodscount",
+          render: (h, params) => {
+            let currentRowData = this.tableData[params.index];
+            return h("Input", {
+              props: {
+                value: currentRowData.goodscount
+              },
+              on: {
+                "on-change": e => {
+                  currentRowData.goodscount = e.target.value;
+                }
+              }
+            });
+          }
+        }
+      ],
+      tableData: []
     };
   }
 };

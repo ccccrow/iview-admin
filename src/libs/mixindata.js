@@ -76,6 +76,7 @@ export default {
               $this.form[key] = data[key];
             }
           }
+          console.log($this.form)
           Bus.$emit(this.callbackDataValue,data);
         })
     }
