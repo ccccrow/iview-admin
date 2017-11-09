@@ -4,13 +4,6 @@
       <Form :model="form" :label-width="120" :rules="rules" ref="form" style="width:98%;">
         <Row>
           <Col span="6">
-          <Form-item label="供应商" prop="supplierid">
-            <Select v-model="form.supplierid">
-              <Option v-for="item in supplierList" :value="item.id" :key="item.id">{{ item.suppliername }}</Option>
-            </Select>
-          </Form-item>
-          </Col>
-          <Col span="6">
           <Form-item label="仓库" prop="storeid">
             <Select v-model="form.storeid">
               <Option v-for="item in storeList" :value="item.id" :key="item.id">{{ item.storename }}</Option>
@@ -25,26 +18,33 @@
           </Form-item>
           </Col>
           <Col span="6">
-          <Form-item label="实付金额" prop="money">
-            <Input v-model="form.money"></Input>
+          <Form-item label="实收金额" prop="money">
+            <Input v-model="form.money" @on-change="changemoney"></Input>
+          </Form-item>
+          </Col>
+          <Col span="6">
+          <Form-item label="会员手机号码" prop="mobile">
+            <AutoComplete v-model="form.mobile" @on-select="queryMemberDetail" :data="memberList" :filter-method="filterMethod" placeholder="请输入" style="width:200px"></AutoComplete>
           </Form-item>
           </Col>
         </Row>
         <Row>
-          <Col span="6">
-          <Form-item label="日期" prop="purchasedate">
-            <DatePicker type="date" placeholder="选择日期" format="yyyy-MM-dd" :value="purchasedate" @on-change="changedate"></DatePicker>
+          <Col span="18">
+          <Form-item label="备注" prop="remark">
+            <Input v-model="form.remark" type="textarea"></Input>
           </Form-item>
           </Col>
-          <Col span="18">
-          <Form-item label="备注" prop="remark">{{form.status}}
-            <Input v-model="form.remark" type="textarea"></Input>
+          <Col span="6">
+          <Form-item label="会员姓名" prop="realname">
+            <Input v-model="form.realname"></Input>
           </Form-item>
           </Col>
         </Row>
         <Row>
           <Col span="24">
-          <Button type="primary" @click.native="showgoods" v-if="form.status==0">添加条目</Button>
+          <Button type="primary" @click.native="showgoods"  v-if="form.id==''">添加条目</Button>
+          <Button type="primary" @click.native="showrebate"  v-if="form.id==''">整单折扣</Button>
+          当前折扣：{{form.rebate}}%
           </Col>
         </Row>
         <Row>
@@ -55,8 +55,8 @@
         <Row>
           <Col span="24" style="text-align:left;margin-top:10px;">
           <Form-item>
-            <Button type="primary" @click.native="submitData" :loading="save_loading" v-if="form.status==0">草稿</Button>
-            <Button type="primary" @click.native="submitData" :loading="save_loading" style="margin-left:15px;" v-if="form.status==0">采购</Button>
+            <Button type="primary" @click.native="submitData" :loading="save_loading" style="margin-left:15px;" v-if="form.id==''">结账</Button>
+             <Button type="error" @click.native="deleteData" :loading="save_loading" style="margin-left:15px;" v-if="form.id!=''">撤消</Button>
             <Button type="ghost" @click.native="finishEdit()" style="margin-left:15px;">取消</Button>
           </Form-item>
           </Col>
@@ -67,19 +67,19 @@
       <Table :columns="goodscolumns" :data="goodsTableData" stripe></Table>
       <p slot="footer"></p>
     </Modal>
+    <Modal v-model="rebatemodel" title="整单折扣" @on-ok="finishRebate">
+      <Input v-model="form.rebate" style="width:100px;"></Input>
+    </Modal>
     <Modal v-model="modgoodsmodal" title="修改条目" @on-ok="finishMod">
       <Form :model="modform" :label-width="120" :rules="modrules" ref="modform">
         <Form-item label="数量" prop="goodscount">
-          <Input v-model="modform.goodscount"></Input>
+          <Input v-model="modform.goodscount" @on-change="changegoodscount"></Input>
         </Form-item>
         <Form-item label="单价" prop="goodsprice">
           <Input v-model="modform.goodsprice" @on-change="changegoodsprice"></Input>
         </Form-item>
-        <Form-item label="折扣" prop="rebate">
-          <Input v-model="modform.rebate" @on-change="changerebate"></Input>
-        </Form-item>
-        <Form-item label="折后价" prop="rebateprice">
-          <Input v-model="modform.rebateprice" @on-change="changerebateprice"></Input>
+        <Form-item label="备注" prop="remark">
+          <Input v-model="modform.remark" type="textarea"></Input>
         </Form-item>
       </Form>
     </Modal>
@@ -121,47 +121,61 @@
 <script>
 import Mixin from "../../../libs/mixindata";
 import Bus from "../../../libs/bus";
-import { accDiv, accMul } from "../../../libs/common";
+import { accDiv, accMul, accAdd } from "../../../libs/common";
 export default {
   created() {
     Bus.$on(this.callbackDataValue, data => {
-      this.purchasedate = data.purchasedate;
+      this.form.money = this.form.money / 100;
     });
   },
   mixins: [Mixin],
   methods: {
-    changegoodsprice() {
-      this.modform.rebateprice =
-        parseFloat(this.modform.goodsprice) *
-        parseInt(this.modform.rebate) /
-        100;
+    filterMethod(value, option) {
+      return option.indexOf(value) !== -1;
     },
-    changerebateprice() {
-      this.modform.goodsprice = accMul(
-        parseFloat(this.modform.rebateprice),
-        accDiv(100, parseInt(this.modform.rebate))
-      );
+    changegoodscount() {},
+    changegoodsprice() {},
+    deleteData() {
+      var $this = this;
+      this.$Modal.confirm({
+        title: "二次确认",
+        content: "<p>是否撤消该零售单</p>",
+        onOk: () => {
+          this.$http
+            .post("ivc/sales/delete", {
+              id: $this.form.id
+            })
+            .then(response => {
+              if (response.data.h.c == "0") {
+                Bus.$emit(this.getDataValue);
+                $this.finishEdit();
+              } else {
+                $this.$Message.error(response.data.h.m);
+              }
+            });
+        }
+      });
     },
-    changerebate() {
-      this.modform.rebateprice =
-        parseFloat(this.modform.goodsprice) *
-        parseInt(this.modform.rebate) /
-        100;
-      this.modform.goodsprice = accMul(
-        parseFloat(this.modform.rebateprice),
-        accDiv(100, parseInt(this.modform.rebate))
-      );
+    changemoney() {
+      let allmoney = 0;
+      this.tableData.forEach((value, index) => {
+        allmoney = accAdd(
+          allmoney,
+          accMul(value.goodscount, value.retailprice)
+        );
+      });
+      this.form.rebate = (this.form.money / allmoney * 100).toFixed(0);
     },
-    changedate(val) {
-      this.purchasedate = val;
+    finishRebate() {
+      this.calMoney();
     },
     finishMod() {
       var currentgoods = this.tableData[this.currentindex];
       currentgoods["goodscount"] = this.modform.goodscount;
-      currentgoods["purchaseprice"] = this.modform.goodsprice;
-      currentgoods["rebate"] = this.modform.rebate;
-      currentgoods["rebateprice"] = this.modform.rebateprice;
+      currentgoods["retailprice"] = this.modform.goodsprice;
+      currentgoods["remark"] = this.modform.remark;
       this.$set(this.tableData, this.currentindex, currentgoods);
+      this.calMoney();
     },
     clicktag(event) {
       let target = event.toElement;
@@ -192,12 +206,13 @@ export default {
     showgoods() {
       this.goodsmodal = true;
     },
+    showrebate() {
+      this.rebatemodel = true;
+    },
     showmodgoods(data) {
       this.modgoodsmodal = true;
       this.modform.goodscount = data.goodscount;
-      this.modform.goodsprice = data.purchaseprice;
-      this.modform.rebate = data.rebate;
-      this.modform.rebateprice = data.rebateprice;
+      this.modform.goodsprice = data.retailprice;
     },
     checkgoods() {
       let flag = false;
@@ -229,12 +244,24 @@ export default {
               spectypeid: this.spectypeidstr,
               specs: this.spectypenamestr,
               goodscount: this.goodscount,
-              purchaseprice: o.purchaseprice,
-              rebate: 100,
-              rebateprice: o.purchaseprice
+              retailprice: o.retailprice,
+              remark: ""
             });
+            this.calMoney();
           });
       }
+    },
+    calMoney() {
+      this.form.money = 0;
+      this.tableData.forEach((value, index) => {
+        this.form.money = accAdd(
+          this.form.money,
+          accMul(
+            value.goodscount,
+            accMul(value.retailprice, this.form.rebate / 100)
+          )
+        );
+      });
     },
     queryGoods() {
       this.$http.post("ivc/goods/query/list", {}).then(response => {
@@ -242,28 +269,42 @@ export default {
         this.goodsTableData = o;
       });
     },
-    querySupplier() {
-      this.$http.post("ivc/supplier/query/list", {}).then(response => {
-        let o = response.data.b;
-        this.supplierList = o;
-      });
-    },
     queryStore() {
       this.$http.post("ivc/store/query/list", {}).then(response => {
         let o = response.data.b;
         this.storeList = o;
+        this.form.storeid = o[0].id;
       });
+    },
+    queryMember() {
+      this.$http.post("ivc/member/query/list", {}).then(response => {
+        let o = response.data.b;
+        o.forEach((value, index) => {
+          this.memberList.push(value.mobile);
+        });
+      });
+    },
+    queryMemberDetail() {
+      this.$http
+        .post("ivc/member/query/entity", { mobile: this.form.mobile })
+        .then(response => {
+          let o = response.data.b;
+          this.form.memberid = o.id;
+          this.form.realname = o.realname;
+        });
     },
     queryAccount() {
       this.$http.post("ivc/account/query/list", {}).then(response => {
         let o = response.data.b;
         this.accountList = o;
+        this.form.accountid = o[0].id;
       });
     },
     queryStock(id) {
       this.$http
         .post("ivc/stock/query/list", {
-          purchaseid: id,type:"2"
+          purchaseid: id,
+          type: "3"
         })
         .then(response => {
           let o = response.data.b;
@@ -275,9 +316,8 @@ export default {
               spectypeid: value.spectypeids,
               specs: value.spectypenames,
               goodscount: value.goodscount,
-              purchaseprice: value.goodsprice / 100,
-              rebate: value.rebate,
-              rebateprice: value.rebateprice / 100
+              retailprice: value.goodsprice / 100,
+              remark: value.remark
             });
           });
         });
@@ -323,22 +363,19 @@ export default {
     },
     submitData() {
       var $this = this;
-      this.form.purchasedate = this.purchasedate;
       this.form.goodsid = [];
       this.form.goodscount = [];
       this.form.goodsprice = [];
-      this.form.rebate = [];
-      this.form.rebateprice = [];
       this.form.spectypenames = [];
       this.form.spectypeids = [];
+      this.form.remarks = [];
       this.tableData.forEach((value, index) => {
         this.form.goodsid.push(value.goodsid);
         this.form.goodscount.push(value.goodscount);
-        this.form.goodsprice.push(value.purchaseprice);
-        this.form.rebate.push(value.rebate);
-        this.form.rebateprice.push(value.rebateprice);
+        this.form.goodsprice.push(value.retailprice);
         this.form.spectypenames.push(value.specs);
         this.form.spectypeids.push(value.spectypeid);
+        this.form.remarks.push(value.remark);
       });
       $this.$refs.form.validate(valid => {
         if (valid) {
@@ -361,10 +398,10 @@ export default {
     }
   },
   mounted() {
-    this.querySupplier();
     this.queryStore();
     this.queryAccount();
     this.queryGoods();
+    this.queryMember();
     let id = this.$route.params.id;
     if (id != "new") {
       this.queryStock(id);
@@ -372,6 +409,7 @@ export default {
   },
   data() {
     return {
+      memberList: [],
       taglist: [],
       goodscount: 0,
       spectypename: {},
@@ -381,6 +419,8 @@ export default {
       modgoodsmodal: false,
       goodsmodal: false,
       goodslistmodal: false,
+      rebatemodel: false,
+      rebate: 100,
       goodscolumns: [
         {
           title: "名称",
@@ -422,7 +462,7 @@ export default {
           title: "操作",
           key: "action",
           render: (h, params) => {
-            if (this.form.status == 0) {
+            if (this.form.id == "") {
               return h("div", [
                 h(
                   "Button",
@@ -460,8 +500,8 @@ export default {
                   "刪除"
                 )
               ]);
-            }else{
-              return ""
+            } else {
+              return "";
             }
           }
         },
@@ -483,40 +523,35 @@ export default {
         },
         {
           title: "单价",
-          key: "purchaseprice"
+          key: "retailprice"
         },
         {
-          title: "折扣",
-          key: "rebate"
-        },
-        {
-          title: "折扣价",
-          key: "rebateprice"
+          title: "备注",
+          key: "remark"
         }
       ],
       tableData: [],
       modform: {
         goodsprice: "",
         goodscount: "",
-        rebate: "",
-        rebateprice: ""
+        remark: ""
       },
       modrules: {},
-      purchasedate: "",
       form: {
-        supplierid: "",
         storeid: "",
         accountid: "",
         money: "0",
-        status: "0",
-        purchasedate: "",
         id: "",
         remark: "",
+        memberid: "",
+        mobile: "",
+        realname: "",
         goodsid: [],
         goodscount: [],
         spectypeids: [],
         spectypenames: [],
-        rebate: [],
+        remarks: [],
+        rebate: 100,
         rebateprice: [],
         goodsprice: []
       },
@@ -525,31 +560,14 @@ export default {
       supplierList: [],
       storeList: [],
       accountList: [],
-      prename: "ivc_purchase",
-      name: "ivcedit_purchase",
-      module: "ivc/purchase",
+      prename: "ivc_sales",
+      name: "ivcedit_sales",
+      module: "ivc/sales",
       rules: {
-        supplierid: [
+        mobile: [
           {
-            type: "number",
             required: true,
-            message: "请选择供应商",
-            trigger: "blur"
-          }
-        ],
-        storeid: [
-          {
-            type: "number",
-            required: true,
-            message: "请选择仓库",
-            trigger: "blur"
-          }
-        ],
-        accountid: [
-          {
-            type: "number",
-            required: true,
-            message: "请选择账户",
+            message: "请选择会员",
             trigger: "blur"
           }
         ]

@@ -1,9 +1,12 @@
-export const deleteButton = (vm,h,currentRow, index) =>{
+export const deleteButton = (vm,h,currentRow, index,name) =>{
+    if(!name){
+      name="删除";
+    }
     return h(
       "Poptip", {
         props: {
           confirm: true,
-          title: "您确定要删除这条数据吗?",
+          title: "您确定要"+name+"这条数据吗?",
           transfer: true
         },
         on: {
@@ -22,12 +25,15 @@ export const deleteButton = (vm,h,currentRow, index) =>{
               size: "small"
             }
           },
-          "删除"
+          name
         )
       ]
     );
 }
-export const  editButton = (vm, h, param, item) => {
+export const  editButton = (vm, h, param, item,name) => {
+  if(!name){
+    name="编辑";
+  }
   return h(
     "Button", {
       style: {
@@ -43,7 +49,7 @@ export const  editButton = (vm, h, param, item) => {
         }
       }
     },
-    "编辑"
+    name
   )
 }
 export const finishEdit = (vm,name)=>{

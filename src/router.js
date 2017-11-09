@@ -167,6 +167,13 @@ export const editRouter = [{
             component: resolve => {
                 require(['./views/ivc/purchase/purchaseedit.vue'], resolve);
             }
+        }, {
+            path: 'sales/:id',
+            title: '编辑',
+            name: 'ivcedit_sales',
+            component: resolve => {
+                require(['./views/ivc/sales/salesedit.vue'], resolve);
+            }
         }
     ]
 }]
@@ -377,6 +384,24 @@ export const appRouter = [{
         name: 'ivc_purchase',
         component: resolve => {
             require(['./views/ivc/purchase/purchase.vue'], resolve);
+        },
+        meta: {
+            keepAlive: true // 需要被缓存
+        },
+
+    }]
+},{
+    path: '/ivc/sales',
+    icon: 'cube',
+    name: 'sales',
+    title: '销售管理',
+    component: Main,
+    children: [{
+        path: 'sales',
+        title: '销售管理',
+        name: 'ivc_sales',
+        component: resolve => {
+            require(['./views/ivc/sales/sales.vue'], resolve);
         },
         meta: {
             keepAlive: true // 需要被缓存
