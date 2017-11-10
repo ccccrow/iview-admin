@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div id="purchasePrint">
     <Card>
       <Form :model="form" :label-width="120" :rules="rules" ref="form" style="width:98%;">
         <Row>
@@ -57,7 +57,8 @@
           <Form-item>
             <Button type="primary" @click.native="submitData" data-status="0" :loading="save_loading" v-if="form.status==0">草稿</Button>
             <Button type="primary" @click.native="submitData" data-status="1" :loading="save_loading" style="margin-left:15px;" v-if="form.status==0">采购</Button>
-            <Button type="ghost" @click.native="finishEdit()" style="margin-left:15px;">取消</Button>
+            <Button type="ghost" @click.native="finishEdit" style="margin-left:15px;">取消</Button>
+            <Button type="ghost" @click.native="pagePrint" style="margin-left:15px;" v-if="form.status==1">打印</Button>
           </Form-item>
           </Col>
         </Row>
@@ -103,6 +104,9 @@
         <Button type="primary" @click.native="processgoods">添加</Button>
       </p>
     </Modal>
+    <template>
+      
+    </template>
   </div>
 </template>
 <style scoped lang="css">
@@ -130,6 +134,13 @@ export default {
   },
   mixins: [Mixin],
   methods: {
+    pagePrint() {
+      let newWindow = window.open("_blank"); //打开新窗口
+      let codestr = document.getElementById("purchasePrint").innerHTML; //获取需要生成pdf页面的div代码
+      newWindow.document.write(codestr); //向文档写入HTML表达式或者JavaScript代码
+      newWindow.document.close(); //关闭document的输出流, 显示选定的数据
+      newWindow.print(); //打印当前窗口
+    },
     changegoodsprice() {
       this.modform.rebateprice =
         parseFloat(this.modform.goodsprice) *
@@ -219,7 +230,7 @@ export default {
     processgoods() {
       if (!this.checkgoods()) {
         this.$http
-          .post("ivc/goods/query/entity", {"id":this.currentgoodsid})
+          .post("ivc/goods/query/entity", { id: this.currentgoodsid })
           .then(response => {
             let o = response.data.b;
             this.tableData.push({
@@ -263,7 +274,8 @@ export default {
     queryStock(id) {
       this.$http
         .post("ivc/stock/query/list", {
-          purchaseid: id,type:"2"
+          purchaseid: id,
+          type: "2"
         })
         .then(response => {
           let o = response.data.b;
@@ -461,8 +473,8 @@ export default {
                   "刪除"
                 )
               ]);
-            }else{
-              return ""
+            } else {
+              return "";
             }
           }
         },
