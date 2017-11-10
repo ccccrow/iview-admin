@@ -37,7 +37,7 @@
           </Form-item>
           </Col>
           <Col span="18">
-          <Form-item label="备注" prop="remark">{{form.status}}
+          <Form-item label="备注" prop="remark">
             <Input v-model="form.remark" type="textarea"></Input>
           </Form-item>
           </Col>
@@ -55,8 +55,8 @@
         <Row>
           <Col span="24" style="text-align:left;margin-top:10px;">
           <Form-item>
-            <Button type="primary" @click.native="submitData" :loading="save_loading" v-if="form.status==0">草稿</Button>
-            <Button type="primary" @click.native="submitData" :loading="save_loading" style="margin-left:15px;" v-if="form.status==0">采购</Button>
+            <Button type="primary" @click.native="submitData" data-status="0" :loading="save_loading" v-if="form.status==0">草稿</Button>
+            <Button type="primary" @click.native="submitData" data-status="1" :loading="save_loading" style="margin-left:15px;" v-if="form.status==0">采购</Button>
             <Button type="ghost" @click.native="finishEdit()" style="margin-left:15px;">取消</Button>
           </Form-item>
           </Col>
@@ -219,7 +219,7 @@ export default {
     processgoods() {
       if (!this.checkgoods()) {
         this.$http
-          .post("ivc/goods/query/" + this.currentgoodsid, {})
+          .post("ivc/goods/query/entity", {"id":this.currentgoodsid})
           .then(response => {
             let o = response.data.b;
             this.tableData.push({
@@ -321,7 +321,7 @@ export default {
         value.style.backgroundColor = "#2b85e4";
       });
     },
-    submitData() {
+    submitData(e) {
       var $this = this;
       this.form.purchasedate = this.purchasedate;
       this.form.goodsid = [];
@@ -331,6 +331,7 @@ export default {
       this.form.rebateprice = [];
       this.form.spectypenames = [];
       this.form.spectypeids = [];
+      this.form.status = e.target.dataset.status;
       this.tableData.forEach((value, index) => {
         this.form.goodsid.push(value.goodsid);
         this.form.goodscount.push(value.goodscount);

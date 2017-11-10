@@ -235,6 +235,7 @@ export const appRouter = [{
     name: 'sys',
     title: '系统管理',
     component: Main,
+    meta: {r: "sys"},
     children: [{
             path: 'user',
             title: '用户管理',
@@ -243,7 +244,9 @@ export const appRouter = [{
                 require(['./views/sys/user.vue'], resolve);
             },
             meta: {
-                keepAlive: true // 需要被缓存
+                keepAlive: true, // 需要被缓存
+                r:'user'
+
             }
         },
         {
@@ -254,7 +257,8 @@ export const appRouter = [{
                 require(['./views/sys/resource.vue'], resolve);
             },
             meta: {
-                keepAlive: true // 需要被缓存
+                keepAlive: true, // 需要被缓存
+                r: "resource"
             }
         },
         {
@@ -265,7 +269,8 @@ export const appRouter = [{
                 require(['./views/sys/role.vue'], resolve);
             },
             meta: {
-                keepAlive: true // 需要被缓存
+                keepAlive: true, // 需要被缓存
+                r: "role"
             }
         },
         {
@@ -276,7 +281,8 @@ export const appRouter = [{
                 require(['./views/sys/org.vue'], resolve);
             },
             meta: {
-                keepAlive: true // 需要被缓存
+                keepAlive: true, // 需要被缓存
+                r: "org"
             }
         }, {
             path: 'dict',
@@ -286,7 +292,8 @@ export const appRouter = [{
                 require(['./views/sys/dict.vue'], resolve);
             },
             meta: {
-                keepAlive: true // 需要被缓存
+                keepAlive: true, // 需要被缓存
+                r: "dict"
             }
         }
     ]

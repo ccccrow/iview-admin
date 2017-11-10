@@ -31,7 +31,7 @@ export default {
       return this.module+"/save"
     },
     getaction(){
-      return this.module+"/query/"
+      return this.module+"/query/entity"
     }
   },
   methods: {
@@ -68,7 +68,7 @@ export default {
     },
     getData: function (id) {
       var $this = this;
-      $this.$http.post( $this.getaction + id)
+      $this.$http.post( $this.getaction,{"id":id})
         .then((response) => {
           let data =  response.data.b;
           for(let key in data){
